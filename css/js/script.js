@@ -1,4 +1,3 @@
-// Obtém os elementos do DOM
 const btnCadastrar = document.getElementById('btnCadastrar');
 const btnCalcular = document.getElementById('btnCalcular');
 const btnReiniciar = document.getElementById('btnReiniciar');
@@ -6,10 +5,15 @@ const telaCadastro = document.getElementById('cadastro');
 const telaMedicao = document.getElementById('medicao');
 const resultado = document.getElementById('resultado');
 
-// Verificação de carregamento
-console.log("Arquivo script.js carregado com sucesso!");
+let historico = JSON.parse(localStorage.getItem('historico')) || [];
 
-// Evento para o botão "Cadastrar"
+// Função para salvar o histórico
+function salvarHistorico(nome, glicemia, status) {
+    historico.push({ nome, glicemia, status, data: new Date().toLocaleString() });
+    localStorage.setItem('historico', JSON.stringify(historico));
+}
+
+// Evento de Cadastro
 btnCadastrar.addEventListener('click', () => {
     const nome = document.getElementById('nome').value;
     const idade = document.getElementById('idade').value;
@@ -19,13 +23,13 @@ btnCadastrar.addEventListener('click', () => {
         return;
     }
 
-    // Oculta a tela de cadastro e exibe a de medição
     telaCadastro.classList.add('hidden');
     telaMedicao.classList.remove('hidden');
 });
 
-// Evento para o botão "Calcular"
+// Evento de Medição
 btnCalcular.addEventListener('click', () => {
+    const nome = document.getElementById('nome').value;
     const glicemia = parseFloat(document.getElementById('glicemia').value);
 
     if (isNaN(glicemia)) {
@@ -33,36 +37,31 @@ btnCalcular.addEventListener('click', () => {
         return;
     }
 
+    let status = '';
     if (glicemia < 70) {
+        status = 'Baixa';
         resultado.innerText = 'Glicemia baixa. Procure orientação médica.';
         resultado.style.color = 'orange';
     } else if (glicemia >= 70 && glicemia <= 140) {
+        status = 'Normal';
         resultado.innerText = 'Glicemia normal.';
         resultado.style.color = 'green';
     } else {
+        status = 'Alta';
         resultado.innerText = 'Glicemia alta. Procure orientação médica.';
         resultado.style.color = 'red';
     }
+
+    salvarHistorico(nome, glicemia, status);
 });
 
-// Evento para o botão "Novo Cadastro"
+// Evento de Reinício
 btnReiniciar.addEventListener('click', () => {
-    // Limpa os campos
     document.getElementById('nome').value = '';
     document.getElementById('idade').value = '';
     document.getElementById('glicemia').value = '';
     resultado.innerText = '';
 
-    // Volta para a tela de cadastro
     telaCadastro.classList.remove('hidden');
     telaMedicao.classList.add('hidden');
 });
-
-// Salvar dados no localStorage
-localStorage.setItem('nome', nome);
-localStorage.setItem('idade', idade);
-
-// Recuperar dados do localStorage
-const nomeSalvo = localStorage.getItem('nome');
-const idadeSalva = localStorage.getItem('idade');
-console.log(nomeSalvo, idadeSalva);
